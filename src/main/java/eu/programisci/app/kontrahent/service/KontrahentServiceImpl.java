@@ -22,15 +22,13 @@ public class KontrahentServiceImpl implements IKontrahentService {
     @Override
     public KontrahentDTO findOne(Long id) {
         KontrahentOB ob = kontrahentRepository.findOne(id);
-        KontrahentDTO dto = kontrahentConverter.obToDto(ob);
-        return dto;
+        return kontrahentConverter.obToDto(ob);
     }
 
     @Override
     public List<KontrahentDTO> findAll() {
         List<KontrahentOB> obList = kontrahentRepository.findAll();
-        List<KontrahentDTO> dtoList = kontrahentConverter.obListToDtoList(obList);
-        return dtoList;
+        return kontrahentConverter.obListToDtoList(obList);
     }
 
     @Override
@@ -42,13 +40,13 @@ public class KontrahentServiceImpl implements IKontrahentService {
     public KontrahentDTO save(KontrahentDTO kontrahentDTO) {
         if(kontrahentDTO.getId() == null)
             return kontrahentConverter.obToDto(create(kontrahentDTO));
-        else
-            return kontrahentConverter.obToDto(update(kontrahentDTO));
+        return kontrahentConverter.obToDto(update(kontrahentDTO));
     }
 
     private KontrahentOB create(KontrahentDTO dto) {
         KontrahentOB ob = kontrahentConverter.dtoToOb(dto);
         ob.setCreationDate(new Date());
+        ob = kontrahentRepository.save(ob);
         return ob;
     }
 
