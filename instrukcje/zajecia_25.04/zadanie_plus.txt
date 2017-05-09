@@ -28,3 +28,8 @@ PKWiUDictDTO:
 	String nazwa;
 	int numerPoziomu;
 
+Działanie RESTa:
+- jeżeli na wejście przyjmie symbol == null - powinien zwrócić wszystkie rekordy z poziomem 2 (symbole o długości 2)
+- jeżeli na wejście przyjmie symbol == "##" (# - cyfra) - powinien zwrócić wszystkie rekordy z poziomem 4 zaczynające się od "##" (symbole o długości 5)
+- jeżeli na wejście przyjmie symbol == "##.##" (# - cyfra) - powinien zwrócić wszystkie rekordy z poziomem 6 zaczynające się od "##.##" (symbole o długości 8)
+- zwracane wyniki powinny być sortowane wg pola KOLEJNOSC rosnąco

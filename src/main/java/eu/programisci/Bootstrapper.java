@@ -4,6 +4,8 @@ import eu.programisci.Test.user.dto.UserDTO;
 import eu.programisci.Test.user.service.IUserService;
 import eu.programisci.app.kontrahent.dto.KontrahentDTO;
 import eu.programisci.app.kontrahent.service.IKontrahentService;
+import eu.programisci.app.pkwiu.dto.PKWiUDTO;
+import eu.programisci.app.pkwiu.service.IPKWiUService;
 import eu.programisci.app.towar.dto.EJednostkaMiary;
 import eu.programisci.app.towar.dto.TowarDTO;
 import eu.programisci.app.towar.service.ITowarService;
@@ -12,6 +14,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.logging.Logger;
 
 @Service
@@ -27,6 +31,9 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
     @Autowired
     private ITowarService towarService;
+
+    @Autowired
+    private IPKWiUService pkwiuService;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -49,5 +56,32 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
         towarService.save(new TowarDTO("Lobos", "01.02.03", EJednostkaMiary.METR_BIEZACY, 12, 12.99));
         towarService.save(new TowarDTO("Kerno", "01.02.01", EJednostkaMiary.METR_KWADRATOWY, 40, 45.45));
         towarService.save(new TowarDTO("Falas", "01.03.01", EJednostkaMiary.SZTUKA, 11, 89.99));
+
+        //id	kolejnosc	symbol	nazwa	elementNadrzednyUuid	uuid	numerPoziomu
+        try {
+            BufferedReader tsvFile = new BufferedReader(new FileReader("src/main/resources/pkwiu2015.csv"));
+            String dataRow = tsvFile.readLine(); // first line with column definitions
+            dataRow = tsvFile.readLine();
+            System.out.println(dataRow);
+            while (dataRow != null) {
+                String[] dataArr = dataRow.split("\\t");
+                String numerPoziomuStr = dataArr[dataArr.length-1];
+                if(!(numerPoziomuStr.equals("2") || numerPoziomuStr.equals("4") || numerPoziomuStr.equals("6")))
+                    continue;
+                Long kolejnosc = Long.valueOf(dataArr[1]).longValue();
+                String symbol = dataArr[2];
+                String nazwa = dataArr[3];
+                Integer numerPoziomu = Integer.valueOf(dataArr[dataArr.length-1]);
+
+                System.out.printf(kolejnosc + symbol + nazwa + numerPoziomu);
+                pkwiuService.save(new PKWiUDTO(kolejnosc, symbol, nazwa, numerPoziomu));
+
+                dataRow = tsvFile.readLine();
+            }
+
+            tsvFile.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
